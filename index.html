@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Inter', sans-serif; }
-        body { background: #0a0a0f; color: #fff; }
+        body { background: #0a0a0f; color: #fff; margin: 0; }
         .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
         .glass:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
         .glow { box-shadow: 0 0 30px rgba(59,130,246,0.3); }
@@ -29,6 +29,8 @@
         .tab-active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; }
         .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+        .success-msg { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -165,14 +167,17 @@
     <script>
         // ═══════════════════════════════════════════
         //  CHANNEL DATA — All Verified Working
+        //  Each channel has: id, name, country, category, logo, url, desc, popular, referer
         // ═══════════════════════════════════════════
         const channels = [
             // ── INDONESIA ──
             { id: 'trans7', name: 'Trans7', country: '🇮🇩', category: 'Indonesia', logo: '📺',
               url: 'https://video.detik.com/trans7/smil:trans7.smil/index.m3u8',
+              referer: 'https://www.detik.com/',
               desc: 'SCTV/Trans Media — Hiburan & Olahraga', popular: true },
             { id: 'transtv', name: 'Trans TV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
               url: 'https://video.detik.com/transtv/smil:transtv.smil/index.m3u8',
+              referer: 'https://www.detik.com/',
               desc: 'Trans Media — Hiburan & Berita', popular: true },
             { id: 'tvri', name: 'TVRI Nasional', country: '🇮🇩', category: 'Indonesia', logo: '📺',
               url: 'https://ott-balancer.tvri.go.id/live/eds/Nasional/hls/Nasional.m3u8',
@@ -206,6 +211,7 @@
               desc: 'TV Lokal Banjarmasin' },
             { id: 'caruban', name: 'Caruban TV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
               url: 'https://stream.carubantv.id/hls/0/stream.m3u8',
+              referer: 'https://stream.carubantv.id',
               desc: 'TV Lokal Madiun' },
             { id: 'banten', name: 'Banten TV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
               url: 'https://5bf7b725107e5.streamlock.net/bantentv/bantentv/playlist.m3u8',
@@ -248,9 +254,6 @@
             { id: 'shoof2', name: 'Alkass SHOOF 2', country: '🇶🇦', category: 'Olahraga', logo: '📺',
               url: 'https://liveeu-gcp.alkassdigital.net/shooflive2/main.m3u8',
               desc: 'Alkass Live Stream 2' },
-            { id: 'aspor', name: 'A Spor', country: '🇹🇷', category: 'Olahraga', logo: '⚽',
-              url: 'https://rnttwmjcin.turknet.ercdn.net/lcpvefbyo/aspor/aspor.m3u8',
-              desc: 'Turkey Sports — Football' },
             { id: 'accdn', name: 'ACCDN', country: '🇺🇸', category: 'Olahraga', logo: '🏈',
               url: 'https://raycom-accdn-firetv.amagi.tv/playlist.m3u8',
               desc: 'ACC Digital Network — US Sports' },
@@ -274,9 +277,6 @@
             { id: 'trt', name: 'TRT World', country: '🇹🇷', category: 'Berita', logo: '📰',
               url: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
               desc: 'Turkish International News' },
-            { id: 'cctv', name: 'CCTV English', country: '🇨🇳', category: 'Berita', logo: '📰',
-              url: 'https://english.cctv.com/live/cctv_English/index.m3u8',
-              desc: 'China Central Television' },
         ];
 
         // World Cup 2026 Schedule
@@ -429,7 +429,7 @@
         }
 
         // ═══════════════════════════════════════════
-        //  PLAYER
+        //  PLAYER — with referer/header support
         // ═══════════════════════════════════════════
         function playChannel(id) {
             const ch = channels.find(c => c.id === id);
@@ -443,6 +443,7 @@
 
             overlay.classList.add('hidden');
             error.classList.add('hidden');
+            error.classList.remove('flex');
             loading.classList.remove('hidden');
             loading.classList.add('flex');
             document.getElementById('currentChannel').textContent = `${ch.logo} ${ch.name}`;
@@ -450,56 +451,80 @@
             document.getElementById('liveIndicator').classList.remove('hidden');
             document.getElementById('liveIndicator').classList.add('flex');
 
+            // Destroy old HLS instance
             if (hls) { hls.destroy(); hls = null; }
 
             const url = ch.url;
-            if (url.includes('.m3u8')) {
-                if (Hls.isSupported()) {
-                    hls = new Hls({
-                        maxBufferLength: 30,
-                        maxMaxBufferLength: 60,
-                        startFragPrefetch: true,
-                        enableWorker: true,
-                    });
-                    hls.loadSource(url);
-                    hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        loading.classList.add('hidden');
-                        loading.classList.remove('flex');
-                        video.play().catch(() => {});
-                    });
-                    hls.on(Hls.Events.ERROR, (event, data) => {
-                        if (data.fatal) {
-                            switch (data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    hls.startLoad();
-                                    break;
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    hls.recoverMediaError();
-                                    break;
-                                default:
-                                    showError('Stream error: ' + data.type);
-                                    break;
-                            }
+            const referer = ch.referer || '';
+
+            if (Hls.isSupported()) {
+                hls = new Hls({
+                    maxBufferLength: 30,
+                    maxMaxBufferLength: 60,
+                    startFragPrefetch: true,
+                    enableWorker: true,
+                    xhrSetup: function(xhr, url) {
+                        // Set referer header if channel requires it
+                        if (referer) {
+                            xhr.setRequestHeader('Referer', referer);
                         }
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url;
-                    video.addEventListener('loadedmetadata', () => {
-                        loading.classList.add('hidden');
-                        loading.classList.remove('flex');
-                        video.play().catch(() => {});
-                    });
-                } else {
-                    showError('Browser tidak mendukung HLS');
-                }
-            } else {
+                    }
+                });
+                
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    loading.classList.add('hidden');
+                    loading.classList.remove('flex');
+                    video.play().catch(() => {});
+                });
+                
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                console.error('Network error, retrying...', data);
+                                // Try without referer if it was set
+                                if (referer && hls) {
+                                    hls.destroy();
+                                    hls = new Hls({
+                                        maxBufferLength: 30,
+                                        enableWorker: true,
+                                    });
+                                    hls.loadSource(url);
+                                    hls.attachMedia(video);
+                                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                                        loading.classList.add('hidden');
+                                        loading.classList.remove('flex');
+                                        video.play().catch(() => {});
+                                    });
+                                    hls.on(Hls.Events.ERROR, (e2, d2) => {
+                                        if (d2.fatal) showError('Stream error: ' + d2.type);
+                                    });
+                                } else {
+                                    hls.startLoad();
+                                }
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.error('Media error, recovering...', data);
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                showError('Stream error: ' + data.type);
+                                break;
+                        }
+                    }
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.addEventListener('loadedmetadata', () => {
                     loading.classList.add('hidden');
                     loading.classList.remove('flex');
                     video.play().catch(() => {});
                 });
+            } else {
+                showError('Browser tidak mendukung HLS');
             }
 
             renderQuickChannels();
@@ -557,5 +582,4 @@
         init();
     </script>
 </body>
-
 </html>
