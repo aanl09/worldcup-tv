@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ World Cup TV - Nonton Piala Dunia Gratis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0f; color: #fff; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+        .glass:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
+        .glow { box-shadow: 0 0 30px rgba(59,130,246,0.3); }
+        .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.4); }
+        .gradient-text { background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .channel-card { transition: all 0.3s ease; cursor: pointer; }
+        .channel-card:hover { transform: translateY(-4px); }
+        .channel-card.active { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+        .live-dot { animation: pulse-live 1.5s infinite; }
+        @keyframes pulse-live { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        #videoPlayer { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; }
+        .match-card { transition: all 0.2s; }
+        .match-card:hover { background: rgba(255,255,255,0.08); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        .tab-active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; }
+        .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">⚽</div>
+                <div>
+                    <h1 class="text-xl font-bold gradient-text">World Cup TV</h1>
+                    <p class="text-xs text-gray-400">Nonton Piala Dunia Gratis</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="liveIndicator" class="hidden items-center gap-2 bg-green-500/10 border border-green-500/30 px-3 py-1.5 rounded-full">
+                    <span class="live-dot w-2 h-2 bg-green-500 rounded-full inline-block"></span>
+                    <span class="text-green-400 text-sm font-medium">LIVE</span>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-gray-500" id="currentTime"></div>
+                    <div class="text-xs text-gray-600">WIB</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6">
+            <button onclick="switchTab('player')" id="tab-player" class="tab-active px-4 py-2 rounded-lg text-sm font-medium transition-all">📺 Player</button>
+            <button onclick="switchTab('schedule')" id="tab-schedule" class="glass px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-white/10">📅 Jadwal</button>
+            <button onclick="switchTab('channels')" id="tab-channels" class="glass px-4 py-2 rounded-lg text-sm font-medium transition-all hover:bg-white/10">📡 Semua Channel</button>
+        </div>
+
+        <!-- Player Tab -->
+        <div id="panel-player">
+            <div class="grid lg:grid-cols-3 gap-6">
+                <!-- Video Player -->
+                <div class="lg:col-span-2">
+                    <div class="glass rounded-2xl overflow-hidden glow">
+                        <div class="relative">
+                            <video id="videoPlayer" controls autoplay muted playsinline></video>
+                            <div id="playerOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
+                                <div class="text-6xl mb-4">⚽</div>
+                                <p class="text-gray-400 text-lg mb-2">Pilih channel untuk mulai nonton</p>
+                                <p class="text-gray-600 text-sm">Klik salah satu channel di bawah</p>
+                            </div>
+                            <div id="loadingOverlay" class="absolute inset-0 flex-col items-center justify-center bg-black/80 hidden">
+                                <div class="loading-spinner mb-4"></div>
+                                <p class="text-gray-400">Memuat stream...</p>
+                            </div>
+                            <div id="errorOverlay" class="absolute inset-0 flex-col items-center justify-center bg-black/80 hidden p-6">
+                                <div class="text-4xl mb-3">⚠️</div>
+                                <p class="text-red-400 text-center mb-4" id="errorMsg">Stream tidak tersedia</p>
+                                <button onclick="retryStream()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition-all">🔄 Coba Lagi</button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="font-bold text-lg" id="currentChannel">Belum ada channel</h2>
+                                    <p class="text-gray-400 text-sm" id="currentInfo">Pilih channel untuk mulai menonton</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="toggleFullscreen()" class="glass p-2 rounded-lg hover:bg-white/10 transition-all" title="Fullscreen">⛶</button>
+                                    <button onclick="pictureInPicture()" class="glass p-2 rounded-lg hover:bg-white/10 transition-all" title="PiP">📌</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Channels -->
+                    <div class="mt-4">
+                        <h3 class="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">⚡ Channel Populer</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="quickChannels"></div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-4">
+                    <!-- Upcoming Matches -->
+                    <div class="glass rounded-2xl p-4">
+                        <h3 class="font-bold mb-3 flex items-center gap-2">🏆 Jadwal Hari Ini</h3>
+                        <div id="todayMatches" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Channel Categories -->
+                    <div class="glass rounded-2xl p-4">
+                        <h3 class="font-bold mb-3 flex items-center gap-2">📡 Kategori</h3>
+                        <div class="space-y-2" id="categories"></div>
+                    </div>
+
+                    <!-- Tips -->
+                    <div class="glass rounded-2xl p-4">
+                        <h3 class="font-bold mb-3">💡 Tips</h3>
+                        <ul class="text-sm text-gray-400 space-y-2">
+                            <li>• Gunakan WiFi untuk kualitas terbaik</li>
+                            <li>• Klik ⛶ untuk fullscreen</li>
+                            <li>• Klik 📌 untuk Picture-in-Picture</li>
+                            <li>• Jika stream buffering, coba channel lain</li>
+                            <li>• Refresh halaman jika ada masalah</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Tab -->
+        <div id="panel-schedule" class="hidden">
+            <div class="glass rounded-2xl p-6">
+                <h2 class="text-xl font-bold mb-4">📅 Jadwal Piala Dunia 2026</h2>
+                <div id="fullSchedule" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- Channels Tab -->
+        <div id="panel-channels" class="hidden">
+            <div class="mb-4">
+                <input type="text" id="searchChannels" placeholder="🔍 Cari channel..." 
+                    class="w-full glass rounded-xl px-4 py-3 bg-transparent text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-blue-500/50">
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="allChannels"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass mt-12 border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 py-4 text-center text-gray-600 text-xs">
+            <p>⚽ World Cup TV — Untuk edukasi & penggunaan pribadi</p>
+            <p class="mt-1">Stream dari sumber publik. Tidak menyimpan konten apapun.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ═══════════════════════════════════════════
+        //  CHANNEL DATA — IPTV Public Streams
+        // ═══════════════════════════════════════════
+        const channels = [
+            // Indonesia
+            { id: 'rcti', name: 'RCTI', country: '🇮🇩', category: 'Indonesia', logo: '📺',
+              url: 'https://mncvision-hls.rctiplus.id/rcti/rcti.stream/chunklist.m3u8',
+              desc: 'Free-to-air Indonesia', popular: true },
+            { id: 'mnctv', name: 'MNC TV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
+              url: 'https://mncvision-hls.rctiplus.id/mnctv/mnctv.stream/chunklist.m3u8',
+              desc: 'Free-to-air Indonesia' },
+            { id: 'gtv', name: 'GTV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
+              url: 'https://mncvision-hls.rctiplus.id/gtv/gtv.stream/chunklist.m3u8',
+              desc: 'Free-to-air Indonesia' },
+            { id: 'inews', name: 'iNews', country: '🇮🇩', category: 'Indonesia', logo: '📰',
+              url: 'https://mncvision-hls.rctiplus.id/inews/inews.stream/chunklist.m3u8',
+              desc: 'News & Sports Indonesia' },
+
+            // International Sports
+            { id: 'fifaplus', name: 'FIFA+', country: '🌍', category: 'Olahraga', logo: '⚽',
+              url: 'https://cdn-videos.akamaized.net/fifa-plus/live/master.m3u8',
+              desc: 'FIFA Official Streaming', popular: true },
+            { id: 'bein1', name: 'beIN Sports 1', country: '🌍', category: 'Olahraga', logo: '⚽',
+              url: 'https://d2n2rm0l5.cloud/live/bein1/playlist.m3u8',
+              desc: 'International Football' },
+            { id: 'bein2', name: 'beIN Sports 2', country: '🌍', category: 'Olahraga', logo: '⚽',
+              url: 'https://d2n2rm0l5.cloud/live/bein2/playlist.m3u8',
+              desc: 'International Football' },
+            { id: 'espn', name: 'ESPN', country: '🇺🇸', category: 'Olahraga', logo: '🏈',
+              url: 'https://cdn-ue1-01.estream.xyz/espn/stream.m3u8',
+              desc: 'US Sports Network', popular: true },
+            { id: 'skysports', name: 'Sky Sports News', country: '🇬🇧', category: 'Olahraga', logo: '🏟️',
+              url: 'https://stream.skysportsnews.com/live/skysportsnews.m3u8',
+              desc: 'UK Sports News' },
+
+            // News
+            { id: 'aljazeera', name: 'Al Jazeera', country: '🌍', category: 'Berita', logo: '📰',
+              url: 'https://live-hls-web-aje.getaj.net/AJE/index.m3u8',
+              desc: 'International News', popular: true },
+            { id: 'dw', name: 'DW News', country: '🇩🇪', category: 'Berita', logo: '📰',
+              url: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8',
+              desc: 'Deutsche Welle News' },
+            { id: 'france24', name: 'France 24', country: '🇫🇷', category: 'Berita', logo: '📰',
+              url: 'https://stream.francetvinfo.fr/live/france24-en-720p.m3u8',
+              desc: 'French International News' },
+            { id: 'nhk', name: 'NHK World', country: '🇯🇵', category: 'Berita', logo: '📰',
+              url: 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index.m3u8',
+              desc: 'Japan Broadcasting' },
+            { id: 'trt', name: 'TRT World', country: '🇹🇷', category: 'Berita', logo: '📰',
+              url: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
+              desc: 'Turkish News' },
+
+            // Entertainment
+            { id: 'fashion', name: 'Fashion TV', country: '🌍', category: 'Hiburan', logo: '👗',
+              url: 'https://fash1043.cloudycdn.services/slive/ftv_ftv_3984_hls.smil/playlist.m3u8',
+              desc: 'Fashion & Lifestyle' },
+            { id: 'bloomberg', name: 'Bloomberg', country: '🇺🇸', category: 'Berita', logo: '📊',
+              url: 'https://bloomberg-cmdl-live.akamaized.net/live/us/BloombergLive/default/main_1.m3u8',
+              desc: 'Financial News' },
+        ];
+
+        // World Cup 2026 Schedule (Sample — Group Stage)
+        const schedule = [
+            { date: 'Jumat, 13 Juni 2026', matches: [
+                { time: '00:00', team1: '🇲🇽 Meksiko', team2: 'Kanada 🇨🇦', venue: 'Estadio Azteca', group: 'A' },
+                { time: '03:00', team1: '🇯epang', team2: 'Selandia Baru 🇳🇿', venue: 'Mercedes-Benz Stadium', group: 'A' },
+            ]},
+            { date: 'Sabtu, 14 Juni 2026', matches: [
+                { time: '00:00', team1: '🇩🇪 Jerman', team2: 'Kolombia 🇨🇴', venue: 'MetLife Stadium', group: 'B' },
+                { time: '03:00', team1: '🇧🇷 Brasil', team2: 'Serbia 🇷🇸', venue: 'SoFi Stadium', group: 'B' },
+                { time: '21:00', team1: '🇫🇷 Prancis', team2: 'Maroko 🇲🇦', venue: 'Hard Rock Stadium', group: 'C' },
+            ]},
+            { date: 'Minggu, 15 Juni 2026', matches: [
+                { time: '00:00', team1: '🇦🇷 Argentina', team2: 'Nigeria 🇳🇬', venue: 'Lincoln Financial Field', group: 'D' },
+                { time: '03:00', team1: '🇪🇸 Spanyol', team2: 'Jepang 🇯🇵', venue: 'BC Place', group: 'D' },
+                { time: '21:00', team1: '🇭🇷 Kroasia', team2: 'Australia 🇦🇺', venue: 'Gillette Stadium', group: 'E' },
+            ]},
+            { date: 'Senin, 16 Juni 2026', matches: [
+                { time: '00:00', team1: '🇵🇹 Portugal', team2: 'Korea Selatan 🇰🇷', venue: 'Lumen Field', group: 'F' },
+                { time: '03:00', team1: '🇧🇪 Belgia', team2: 'Kamerun 🇨🇲', venue: 'BMO Stadium', group: 'F' },
+            ]},
+        ];
+
+        // ═══════════════════════════════════════════
+        //  STATE
+        // ═══════════════════════════════════════════
+        let hls = null;
+        let currentChannelId = null;
+
+        // ═══════════════════════════════════════════
+        //  INIT
+        // ═══════════════════════════════════════════
+        function init() {
+            renderQuickChannels();
+            renderCategories();
+            renderAllChannels();
+            renderSchedule();
+            renderTodayMatches();
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            document.getElementById('searchChannels').addEventListener('input', (e) => {
+                renderAllChannels(e.target.value);
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        //  CLOCK
+        // ═══════════════════════════════════════════
+        function updateClock() {
+            const now = new Date();
+            const wib = new Date(now.getTime() + (7 * 3600000));
+            document.getElementById('currentTime').textContent = 
+                wib.toUTCString().slice(17, 22);
+        }
+
+        // ═══════════════════════════════════════════
+        //  TABS
+        // ═══════════════════════════════════════════
+        function switchTab(tab) {
+            ['player', 'schedule', 'channels'].forEach(t => {
+                document.getElementById(`panel-${t}`).classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById(`tab-${t}`);
+                btn.classList.toggle('tab-active', t === tab);
+                btn.classList.toggle('glass', t !== tab);
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        //  RENDER
+        // ═══════════════════════════════════════════
+        function renderQuickChannels() {
+            const popular = channels.filter(c => c.popular);
+            document.getElementById('quickChannels').innerHTML = popular.map(c => `
+                <div class="channel-card glass rounded-xl p-3 text-center ${currentChannelId === c.id ? 'active' : ''}" 
+                     onclick="playChannel('${c.id}')">
+                    <div class="text-2xl mb-1">${c.logo}</div>
+                    <div class="text-sm font-semibold">${c.name}</div>
+                    <div class="text-xs text-gray-500">${c.country}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderCategories() {
+            const cats = [...new Set(channels.map(c => c.category))];
+            document.getElementById('categories').innerHTML = cats.map(cat => {
+                const count = channels.filter(c => c.category === cat).length;
+                return `
+                    <button onclick="switchTab('channels'); document.getElementById('searchChannels').value='${cat}'; renderAllChannels('${cat}')" 
+                        class="w-full glass rounded-lg px-3 py-2 text-left text-sm hover:bg-white/10 transition-all flex justify-between">
+                        <span>${cat}</span>
+                        <span class="text-gray-500">${count}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderAllChannels(filter = '') {
+            const filtered = channels.filter(c => 
+                !filter || 
+                c.name.toLowerCase().includes(filter.toLowerCase()) || 
+                c.category.toLowerCase().includes(filter.toLowerCase()) ||
+                c.desc.toLowerCase().includes(filter.toLowerCase())
+            );
+            document.getElementById('allChannels').innerHTML = filtered.map(c => `
+                <div class="channel-card glass rounded-xl p-4 ${currentChannelId === c.id ? 'active' : ''}" 
+                     onclick="playChannel('${c.id}')">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-3xl">${c.logo}</span>
+                        <div>
+                            <div class="font-bold">${c.name}</div>
+                            <div class="text-xs text-gray-400">${c.country} ${c.category}</div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500">${c.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderTodayMatches() {
+            const today = schedule[0];
+            if (!today) return;
+            document.getElementById('todayMatches').innerHTML = today.matches.map(m => `
+                <div class="match-card rounded-lg p-3 bg-white/5">
+                    <div class="text-xs text-blue-400 font-medium mb-1">${m.group ? 'Grup ' + m.group : ''} · ${m.time} WIB</div>
+                    <div class="text-sm font-semibold">${m.team1} vs ${m.team2}</div>
+                    <div class="text-xs text-gray-500 mt-1">📍 ${m.venue}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderSchedule() {
+            document.getElementById('fullSchedule').innerHTML = schedule.map(day => `
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-blue-400 mb-3">📅 ${day.date}</h3>
+                    <div class="space-y-2">
+                        ${day.matches.map(m => `
+                            <div class="glass rounded-xl p-4 flex items-center justify-between match-card">
+                                <div>
+                                    <div class="text-xs text-gray-500 mb-1">${m.group ? 'Grup ' + m.group : ''} · 📍 ${m.venue}</div>
+                                    <div class="font-semibold">${m.team1} vs ${m.team2}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-bold text-blue-400">${m.time}</div>
+                                    <div class="text-xs text-gray-500">WIB</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ═══════════════════════════════════════════
+        //  PLAYER
+        // ═══════════════════════════════════════════
+        function playChannel(id) {
+            const ch = channels.find(c => c.id === id);
+            if (!ch) return;
+
+            currentChannelId = id;
+            const video = document.getElementById('videoPlayer');
+            const overlay = document.getElementById('playerOverlay');
+            const loading = document.getElementById('loadingOverlay');
+            const error = document.getElementById('errorOverlay');
+
+            // Update UI
+            overlay.classList.add('hidden');
+            error.classList.add('hidden');
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+            document.getElementById('currentChannel').textContent = `${ch.logo} ${ch.name}`;
+            document.getElementById('currentInfo').textContent = `${ch.country} ${ch.category} — ${ch.desc}`;
+            document.getElementById('liveIndicator').classList.remove('hidden');
+            document.getElementById('liveIndicator').classList.add('flex');
+
+            // Destroy old HLS
+            if (hls) { hls.destroy(); hls = null; }
+
+            // Play stream
+            const url = ch.url;
+            if (url.includes('.m3u8')) {
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        maxBufferLength: 30,
+                        maxMaxBufferLength: 60,
+                        startFragPrefetch: true,
+                        enableWorker: true,
+                    });
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        loading.classList.add('hidden');
+                        loading.classList.remove('flex');
+                        video.play().catch(() => {});
+                    });
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        if (data.fatal) {
+                            showError('Stream error: ' + data.type);
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('loadedmetadata', () => {
+                        loading.classList.add('hidden');
+                        loading.classList.remove('flex');
+                        video.play().catch(() => {});
+                    });
+                } else {
+                    showError('Browser tidak mendukung HLS');
+                }
+            } else {
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => {
+                    loading.classList.add('hidden');
+                    loading.classList.remove('flex');
+                    video.play().catch(() => {});
+                });
+            }
+
+            // Update active states
+            renderQuickChannels();
+            renderAllChannels(document.getElementById('searchChannels')?.value || '');
+
+            // Switch to player tab
+            switchTab('player');
+        }
+
+        function showError(msg) {
+            const loading = document.getElementById('loadingOverlay');
+            const error = document.getElementById('errorOverlay');
+            loading.classList.add('hidden');
+            loading.classList.remove('flex');
+            error.classList.remove('hidden');
+            error.classList.add('flex');
+            document.getElementById('errorMsg').textContent = msg;
+        }
+
+        function retryStream() {
+            if (currentChannelId) playChannel(currentChannelId);
+        }
+
+        // ═══════════════════════════════════════════
+        //  CONTROLS
+        // ═══════════════════════════════════════════
+        function toggleFullscreen() {
+            const player = document.getElementById('videoPlayer');
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                player.requestFullscreen?.() || player.webkitRequestFullscreen?.();
+            }
+        }
+
+        function pictureInPicture() {
+            const video = document.getElementById('videoPlayer');
+            if (document.pictureInPictureElement) {
+                document.exitPictureInPicture().catch(() => {});
+            } else {
+                video.requestPictureInPicture?.().catch(() => {});
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            const video = document.getElementById('videoPlayer');
+            switch(e.key) {
+                case 'f': toggleFullscreen(); break;
+                case ' ': e.preventDefault(); video.paused ? video.play() : video.pause(); break;
+                case 'm': video.muted = !video.muted; break;
+                case 'ArrowUp': video.volume = Math.min(1, video.volume + 0.1); break;
+                case 'ArrowDown': video.volume = Math.max(0, video.volume - 0.1); break;
+            }
+        });
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
