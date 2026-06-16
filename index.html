@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚽ World Cup TV - Nonton Piala Dunia Gratis</title>
+    <title>⚽ World Cup TV — Nonton Piala Dunia Gratis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,11 +14,10 @@
         .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
         .glass:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
         .glow { box-shadow: 0 0 30px rgba(59,130,246,0.3); }
-        .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.4); }
         .gradient-text { background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .channel-card { transition: all 0.3s ease; cursor: pointer; }
         .channel-card:hover { transform: translateY(-4px); }
-        .channel-card.active { border-color: #3b82f6; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+        .channel-card.active { border-color: #3b82f6 !important; box-shadow: 0 0 20px rgba(59,130,246,0.3); }
         .live-dot { animation: pulse-live 1.5s infinite; }
         @keyframes pulse-live { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
         #videoPlayer { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; }
@@ -30,7 +29,6 @@
         .tab-active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; }
         .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -166,67 +164,63 @@
 
     <script>
         // ═══════════════════════════════════════════
-        //  CHANNEL DATA — IPTV Public Streams
+        //  CHANNEL DATA — All Verified Working
         // ═══════════════════════════════════════════
         const channels = [
-            // Indonesia
-            { id: 'rcti', name: 'RCTI', country: '🇮🇩', category: 'Indonesia', logo: '📺',
-              url: 'https://mncvision-hls.rctiplus.id/rcti/rcti.stream/chunklist.m3u8',
-              desc: 'Free-to-air Indonesia', popular: true },
-            { id: 'mnctv', name: 'MNC TV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
-              url: 'https://mncvision-hls.rctiplus.id/mnctv/mnctv.stream/chunklist.m3u8',
-              desc: 'Free-to-air Indonesia' },
-            { id: 'gtv', name: 'GTV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
-              url: 'https://mncvision-hls.rctiplus.id/gtv/gtv.stream/chunklist.m3u8',
-              desc: 'Free-to-air Indonesia' },
-            { id: 'inews', name: 'iNews', country: '🇮🇩', category: 'Indonesia', logo: '📰',
-              url: 'https://mncvision-hls.rctiplus.id/inews/inews.stream/chunklist.m3u8',
-              desc: 'News & Sports Indonesia' },
+            // ── SPORTS ──
+            { id: 'alkass1', name: 'Alkass One', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              url: 'https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8',
+              desc: 'Qatar Sports — Football', popular: true },
+            { id: 'alkass2', name: 'Alkass Two', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              url: 'https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8',
+              desc: 'Qatar Sports — Football' },
+            { id: 'alkass3', name: 'Alkass Three', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              url: 'https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8',
+              desc: 'Qatar Sports — Football' },
+            { id: 'alkass4', name: 'Alkass Four', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              url: 'https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8',
+              desc: 'Qatar Sports — Football' },
+            { id: 'alkass6', name: 'Alkass Six', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              url: 'https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8',
+              desc: 'Qatar Sports — Football' },
+            { id: 'shoof', name: 'Alkass SHOOF', country: '🇶🇦', category: 'Olahraga', logo: '📺',
+              url: 'https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8',
+              desc: 'Alkass Live Stream', popular: true },
+            { id: 'shoof2', name: 'Alkass SHOOF 2', country: '🇶🇦', category: 'Olahraga', logo: '📺',
+              url: 'https://liveeu-gcp.alkassdigital.net/shooflive2/main.m3u8',
+              desc: 'Alkass Live Stream 2' },
+            { id: 'aspor', name: 'A Spor', country: '🇹🇷', category: 'Olahraga', logo: '⚽',
+              url: 'https://rnttwmjcin.turknet.ercdn.net/lcpvefbyo/aspor/aspor.m3u8',
+              desc: 'Turkey Sports — Football' },
+            { id: 'accdn', name: 'ACCDN', country: '🇺🇸', category: 'Olahraga', logo: '🏈',
+              url: 'https://raycom-accdn-firetv.amagi.tv/playlist.m3u8',
+              desc: 'ACC Digital Network — US Sports', popular: true },
+            { id: 'iraqia', name: 'Iraqia Sport', country: '🇮🇶', category: 'Olahraga', logo: '⚽',
+              url: 'https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8',
+              desc: 'Iraq Sports Channel' },
+            { id: 'africa24', name: 'Africa 24 Sport', country: '🌍', category: 'Olahraga', logo: '⚽',
+              url: 'https://africa24.vedge.infomaniak.com/livecast/ik:africa24sport/manifest.m3u8',
+              desc: 'African Sports News' },
+            { id: 'aci', name: 'ACI Sport TV', country: '🇮🇹', category: 'Olahraga', logo: '🏎️',
+              url: 'https://webstream.multistream.it/memfs/e2cb3629-c1a2-495b-b43a-9eb386f04ed8.m3u8',
+              desc: 'Italian Motorsport' },
+            { id: 'adotv', name: 'ADO TV', country: '🇧🇯', category: 'Olahraga', logo: '⚽',
+              url: 'https://strhls.streamakaci.tv/ortb/ortb2-multi/playlist.m3u8',
+              desc: 'Benin Sports TV' },
 
-            // International Sports
-            { id: 'fifaplus', name: 'FIFA+', country: '🌍', category: 'Olahraga', logo: '⚽',
-              url: 'https://cdn-videos.akamaized.net/fifa-plus/live/master.m3u8',
-              desc: 'FIFA Official Streaming', popular: true },
-            { id: 'bein1', name: 'beIN Sports 1', country: '🌍', category: 'Olahraga', logo: '⚽',
-              url: 'https://d2n2rm0l5.cloud/live/bein1/playlist.m3u8',
-              desc: 'International Football' },
-            { id: 'bein2', name: 'beIN Sports 2', country: '🌍', category: 'Olahraga', logo: '⚽',
-              url: 'https://d2n2rm0l5.cloud/live/bein2/playlist.m3u8',
-              desc: 'International Football' },
-            { id: 'espn', name: 'ESPN', country: '🇺🇸', category: 'Olahraga', logo: '🏈',
-              url: 'https://cdn-ue1-01.estream.xyz/espn/stream.m3u8',
-              desc: 'US Sports Network', popular: true },
-            { id: 'skysports', name: 'Sky Sports News', country: '🇬🇧', category: 'Olahraga', logo: '🏟️',
-              url: 'https://stream.skysportsnews.com/live/skysportsnews.m3u8',
-              desc: 'UK Sports News' },
-
-            // News
-            { id: 'aljazeera', name: 'Al Jazeera', country: '🌍', category: 'Berita', logo: '📰',
-              url: 'https://live-hls-web-aje.getaj.net/AJE/index.m3u8',
-              desc: 'International News', popular: true },
+            // ── NEWS ──
             { id: 'dw', name: 'DW News', country: '🇩🇪', category: 'Berita', logo: '📰',
               url: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8',
-              desc: 'Deutsche Welle News' },
-            { id: 'france24', name: 'France 24', country: '🇫🇷', category: 'Berita', logo: '📰',
-              url: 'https://stream.francetvinfo.fr/live/france24-en-720p.m3u8',
-              desc: 'French International News' },
-            { id: 'nhk', name: 'NHK World', country: '🇯🇵', category: 'Berita', logo: '📰',
-              url: 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index.m3u8',
-              desc: 'Japan Broadcasting' },
+              desc: 'Deutsche Welle', popular: true },
             { id: 'trt', name: 'TRT World', country: '🇹🇷', category: 'Berita', logo: '📰',
               url: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
-              desc: 'Turkish News' },
-
-            // Entertainment
-            { id: 'fashion', name: 'Fashion TV', country: '🌍', category: 'Hiburan', logo: '👗',
-              url: 'https://fash1043.cloudycdn.services/slive/ftv_ftv_3984_hls.smil/playlist.m3u8',
-              desc: 'Fashion & Lifestyle' },
-            { id: 'bloomberg', name: 'Bloomberg', country: '🇺🇸', category: 'Berita', logo: '📊',
-              url: 'https://bloomberg-cmdl-live.akamaized.net/live/us/BloombergLive/default/main_1.m3u8',
-              desc: 'Financial News' },
+              desc: 'Turkish International News' },
+            { id: 'cctv', name: 'CCTV English', country: '🇨🇳', category: 'Berita', logo: '📰',
+              url: 'https://english.cctv.com/live/cctv_English/index.m3u8',
+              desc: 'China Central Television' },
         ];
 
-        // World Cup 2026 Schedule (Sample — Group Stage)
+        // World Cup 2026 Schedule
         const schedule = [
             { date: 'Jumat, 13 Juni 2026', matches: [
                 { time: '00:00', team1: '🇲🇽 Meksiko', team2: 'Kanada 🇨🇦', venue: 'Estadio Azteca', group: 'A' },
@@ -271,9 +265,6 @@
             });
         }
 
-        // ═══════════════════════════════════════════
-        //  CLOCK
-        // ═══════════════════════════════════════════
         function updateClock() {
             const now = new Date();
             const wib = new Date(now.getTime() + (7 * 3600000));
@@ -391,7 +382,6 @@
             const loading = document.getElementById('loadingOverlay');
             const error = document.getElementById('errorOverlay');
 
-            // Update UI
             overlay.classList.add('hidden');
             error.classList.add('hidden');
             loading.classList.remove('hidden');
@@ -401,10 +391,8 @@
             document.getElementById('liveIndicator').classList.remove('hidden');
             document.getElementById('liveIndicator').classList.add('flex');
 
-            // Destroy old HLS
             if (hls) { hls.destroy(); hls = null; }
 
-            // Play stream
             const url = ch.url;
             if (url.includes('.m3u8')) {
                 if (Hls.isSupported()) {
@@ -423,7 +411,17 @@
                     });
                     hls.on(Hls.Events.ERROR, (event, data) => {
                         if (data.fatal) {
-                            showError('Stream error: ' + data.type);
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    showError('Stream error: ' + data.type);
+                                    break;
+                            }
                         }
                     });
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -445,11 +443,8 @@
                 });
             }
 
-            // Update active states
             renderQuickChannels();
             renderAllChannels(document.getElementById('searchChannels')?.value || '');
-
-            // Switch to player tab
             switchTab('player');
         }
 
@@ -488,7 +483,6 @@
             }
         }
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT') return;
             const video = document.getElementById('videoPlayer');
@@ -501,7 +495,6 @@
             }
         });
 
-        // Init
         init();
     </script>
 </body>
