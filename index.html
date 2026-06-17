@@ -29,7 +29,6 @@
         .tab-active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; }
         .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .badge-fifa { background: linear-gradient(135deg, #dc2626, #f59e0b); }
     </style>
 </head>
 <body>
@@ -71,7 +70,7 @@
                             <div id="playerOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
                                 <div class="text-6xl mb-4">🏆</div>
                                 <p class="text-gray-400 text-lg mb-2">Pilih channel untuk nonton Piala Dunia</p>
-                                <p class="text-gray-600 text-sm">TVRI 🇮🇩 · Alkass 🇶🇦 · beIN Sports 🌍</p>
+                                <p class="text-gray-600 text-sm">TVRI 🇮🇩 · Alkass 🇶🇦 · beIN 🌍 · Arryadia 🇲🇦</p>
                             </div>
                             <div id="loadingOverlay" class="absolute inset-0 flex-col items-center justify-center bg-black/80 hidden">
                                 <div class="loading-spinner mb-4"></div>
@@ -97,7 +96,7 @@
                         </div>
                     </div>
                     <div class="mt-4">
-                        <h3 class="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">⚡ Channel FIFA World Cup</h3>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">⚡ Channel Populer</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="quickChannels"></div>
                     </div>
                 </div>
@@ -114,11 +113,12 @@
                     <div class="glass rounded-2xl p-4">
                         <h3 class="font-bold mb-3">💡 Tips</h3>
                         <ul class="text-sm text-gray-400 space-y-2">
-                            <li>• 🇮🇩 TVRI = siaran gratis Indonesia</li>
-                            <li>• 🇶🇦 Alkass = siaran dari Qatar (tuan rumah)</li>
-                            <li>• 🌍 beIN Sports = jaringan olahraga global</li>
-                            <li>• Klik ⛶ untuk fullscreen</li>
-                            <li>• Jika buffering, coba channel lain</li>
+                            <li>• 🇮🇩 TVRI = siaran Indonesia</li>
+                            <li>• 🇶🇦 Alkass = Qatar Sports</li>
+                            <li>• 🌍 beIN = Football Global</li>
+                            <li>• 🇲🇦 Arryadia = Maroko Sports</li>
+                            <li>• 🇧🇭 Bahrain Sports</li>
+                            <li>• ⛶ Fullscreen · 📌 PiP</li>
                         </ul>
                     </div>
                 </div>
@@ -143,56 +143,79 @@
 
     <footer class="glass mt-12 border-t border-white/5">
         <div class="max-w-7xl mx-auto px-4 py-4 text-center text-gray-600 text-xs">
-            <p>⚽ World Cup TV — Semua stream sudah diverifikasi bisa diputar</p>
+            <p>⚽ World Cup TV — Semua stream sudah diverifikasi bisa diputar (test segment > 100KB)</p>
         </div>
     </footer>
 
     <script>
         // ═══════════════════════════════════════════
-        //  FIFA World Cup Channels — Verified Working
-        //  Semua sudah test download segment > 100KB
+        //  FIFA World Cup Channels — All Verified
+        //  Source: iptv-org.github.io (VLC playlists)
+        //  Test: download .ts segment > 100KB
         // ═══════════════════════════════════════════
         const channels = [
-            // 🇮🇩 INDONESIA — FIFA Rights Holder
+            // 🇮🇩 INDONESIA
             { id: 'tvri', name: 'TVRI Nasional', country: '🇮🇩', category: 'Indonesia', logo: '📺',
               url: 'https://ott-balancer.tvri.go.id/live/eds/Nasional/hls/Nasional.m3u8',
-              desc: 'TVRI — Siaran resmi Piala Dunia di Indonesia', popular: true },
+              desc: 'TVRI — Siaran resmi Indonesia', popular: true },
 
-            // 🇶🇦 ALKASS — Qatar (FIFA World Cup 2022 & Sports)
+            // 🇶🇦 ALKASS QATAR (7 channels)
             { id: 'alkass1', name: 'Alkass One', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8',
-              desc: 'Alkass Sports — Qatar Football HD', popular: true },
+              desc: 'Qatar Sports HD', popular: true },
             { id: 'alkass2', name: 'Alkass Two', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8',
-              desc: 'Alkass Sports — Qatar Football HD' },
+              desc: 'Qatar Sports HD' },
             { id: 'alkass3', name: 'Alkass Three', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8',
-              desc: 'Alkass Sports — Qatar Football HD' },
+              desc: 'Qatar Sports HD' },
             { id: 'alkass4', name: 'Alkass Four', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8',
-              desc: 'Alkass Sports — Qatar Football HD' },
+              desc: 'Qatar Sports HD' },
             { id: 'alkass6', name: 'Alkass Six', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8',
-              desc: 'Alkass Sports — Qatar Football HD' },
+              desc: 'Qatar Sports HD' },
             { id: 'shoof', name: 'Alkass SHOOF', country: '🇶🇦', category: 'Alkass Qatar', logo: '📺',
               url: 'https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8',
-              desc: 'Alkass Live Stream — Sports', popular: true },
+              desc: 'Alkass Live Sports', popular: true },
             { id: 'shoof2', name: 'Alkass SHOOF 2', country: '🇶🇦', category: 'Alkass Qatar', logo: '📺',
               url: 'https://liveeu-gcp.alkassdigital.net/shooflive2/main.m3u8',
-              desc: 'Alkass Live Stream 2 — Sports' },
+              desc: 'Alkass Live Sports 2' },
 
-            // 🌍 beIN SPORTS — FIFA Rights Holder (Global)
+            // 🌍 beIN SPORTS (2 channels)
             { id: 'bein', name: 'beIN Sports XTRA', country: '🌍', category: 'beIN Sports', logo: '⚽',
               url: 'https://bein-xtra-bein.amagi.tv/playlist.m3u8',
-              desc: 'beIN Sports XTRA — Football Global', popular: true },
+              desc: 'beIN Football Global', popular: true },
             { id: 'bein_es', name: 'beIN Sports XTRA ES', country: '🌍', category: 'beIN Sports', logo: '⚽',
               url: 'https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8',
-              desc: 'beIN Sports XTRA — Español' },
+              desc: 'beIN Football Español' },
 
-            // 📰 NEWS — World Cup Coverage
+            // 🇲🇦 ARRYADIA MOROCCO (5 channels)
+            { id: 'arryadia', name: 'Arryadia', country: '🇲🇦', category: 'Arryadia', logo: '⚽',
+              url: 'https://stream-lb.livemediama.com/arryadia/hls/master.m3u8',
+              desc: 'Morocco Sports TV' },
+            { id: 'arryadia1', name: 'Arryadia HD 1', country: '🇲🇦', category: 'Arryadia', logo: '⚽',
+              url: 'https://stream-lb.livemediama.com/arryadia-hd-01/hls/master.m3u8',
+              desc: 'Morocco Sports HD 1', popular: true },
+            { id: 'arryadia2', name: 'Arryadia HD 2', country: '🇲🇦', category: 'Arryadia', logo: '⚽',
+              url: 'https://stream-lb.livemediama.com/arryadia-hd-02/hls/master.m3u8',
+              desc: 'Morocco Sports HD 2' },
+            { id: 'arryadia3', name: 'Arryadia HD 3', country: '🇲🇦', category: 'Arryadia', logo: '⚽',
+              url: 'https://stream-lb.livemediama.com/arryadia-hd-03/hls/master.m3u8',
+              desc: 'Morocco Sports HD 3' },
+            { id: 'arryadiatnt', name: 'Arryadia TNT', country: '🇲🇦', category: 'Arryadia', logo: '⚽',
+              url: 'https://stream-lb.livemediama.com/arryadia-tnt/hls/master.m3u8',
+              desc: 'Morocco Sports TNT' },
+
+            // 🇧🇭 BAHRAIN SPORTS
+            { id: 'bahrain', name: 'Bahrain Sports', country: '🇧🇭', category: 'Timur Tengah', logo: '⚽',
+              url: 'https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8',
+              desc: 'Bahrain Sports TV' },
+
+            // 📰 NEWS
             { id: 'trt', name: 'TRT World', country: '🇹🇷', category: 'Berita', logo: '📰',
               url: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
-              desc: 'TRT World — International News & Sports', popular: true },
+              desc: 'International News & Sports', popular: true },
         ];
 
         const schedule = [
