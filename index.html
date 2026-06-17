@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚽ World Cup TV — Nonton Piala Dunia Gratis</title>
+    <title>⚽ World Cup TV — Nonton Piala Dunia 2026 Gratis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,6 +29,7 @@
         .tab-active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; }
         .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .badge-fifa { background: linear-gradient(135deg, #dc2626, #f59e0b); }
     </style>
 </head>
 <body>
@@ -38,7 +39,7 @@
                 <div class="text-3xl">⚽</div>
                 <div>
                     <h1 class="text-xl font-bold gradient-text">World Cup TV</h1>
-                    <p class="text-xs text-gray-400">Nonton Piala Dunia Gratis</p>
+                    <p class="text-xs text-gray-400">FIFA Piala Dunia 2026 — Live Streaming</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -68,9 +69,9 @@
                         <div class="relative">
                             <video id="videoPlayer" controls autoplay muted playsinline></video>
                             <div id="playerOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
-                                <div class="text-6xl mb-4">📺</div>
-                                <p class="text-gray-400 text-lg mb-2">Pilih channel untuk mulai nonton</p>
-                                <p class="text-gray-600 text-sm">Klik salah satu channel di bawah</p>
+                                <div class="text-6xl mb-4">🏆</div>
+                                <p class="text-gray-400 text-lg mb-2">Pilih channel untuk nonton Piala Dunia</p>
+                                <p class="text-gray-600 text-sm">TVRI 🇮🇩 · Alkass 🇶🇦 · beIN Sports 🌍</p>
                             </div>
                             <div id="loadingOverlay" class="absolute inset-0 flex-col items-center justify-center bg-black/80 hidden">
                                 <div class="loading-spinner mb-4"></div>
@@ -96,7 +97,7 @@
                         </div>
                     </div>
                     <div class="mt-4">
-                        <h3 class="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">⚡ Channel Populer</h3>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wider">⚡ Channel FIFA World Cup</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="quickChannels"></div>
                     </div>
                 </div>
@@ -113,9 +114,10 @@
                     <div class="glass rounded-2xl p-4">
                         <h3 class="font-bold mb-3">💡 Tips</h3>
                         <ul class="text-sm text-gray-400 space-y-2">
-                            <li>• Gunakan WiFi untuk kualitas terbaik</li>
+                            <li>• 🇮🇩 TVRI = siaran gratis Indonesia</li>
+                            <li>• 🇶🇦 Alkass = siaran dari Qatar (tuan rumah)</li>
+                            <li>• 🌍 beIN Sports = jaringan olahraga global</li>
                             <li>• Klik ⛶ untuk fullscreen</li>
-                            <li>• Klik 📌 untuk Picture-in-Picture</li>
                             <li>• Jika buffering, coba channel lain</li>
                         </ul>
                     </div>
@@ -147,57 +149,50 @@
 
     <script>
         // ═══════════════════════════════════════════
-        //  CHANNELS — Semua sudah diverifikasi ada segment video
-        //  Test: curl segment download > 100KB
+        //  FIFA World Cup Channels — Verified Working
+        //  Semua sudah test download segment > 100KB
         // ═══════════════════════════════════════════
         const channels = [
-            // ── INDONESIA (5 verified) ──
+            // 🇮🇩 INDONESIA — FIFA Rights Holder
             { id: 'tvri', name: 'TVRI Nasional', country: '🇮🇩', category: 'Indonesia', logo: '📺',
               url: 'https://ott-balancer.tvri.go.id/live/eds/Nasional/hls/Nasional.m3u8',
-              desc: 'TV Republik Indonesia — Stasiun Negara', popular: true },
-            { id: 'mbgtv', name: 'MBG TV', country: '🇮🇩', category: 'Indonesia', logo: '🏛️',
-              url: 'https://stream.convergen.co/mbg_stream/smil:mbStream.smil/playlist.m3u8',
-              desc: 'TV Legislatif Indonesia' },
-            { id: 'daai', name: 'DAAI TV', country: '🇮🇩', category: 'Indonesia', logo: '💛',
-              url: 'https://pull.daaiplus.com/live-DAAIPLUS/live-DAAIPLUS_HD.m3u8',
-              desc: 'TV Kemanusiaan & Pendidikan' },
-            { id: 'rri', name: 'RRI Net', country: '🇮🇩', category: 'Indonesia', logo: '📻',
-              url: 'https://cdn.adyadigitalteknologi.com:8090/vod/relay.m3u8',
-              desc: 'Radio Republik Indonesia — TV' },
-            { id: 'lingkar', name: 'Lingkar TV', country: '🇮🇩', category: 'Indonesia', logo: '🔄',
-              url: 'https://lingkartv.my.id/hls/lingkartv.m3u8',
-              desc: 'Berita & Hiburan' },
-            { id: 'caruban', name: 'Caruban TV', country: '🇮🇩', category: 'Indonesia', logo: '📺',
-              url: 'https://stream.carubantv.id/hls/0/stream.m3u8',
-              desc: 'TV Lokal Madiun' },
+              desc: 'TVRI — Siaran resmi Piala Dunia di Indonesia', popular: true },
 
-            // ── SPORTS (8 verified — Alkass Qatar Network) ──
-            { id: 'alkass1', name: 'Alkass One', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+            // 🇶🇦 ALKASS — Qatar (FIFA World Cup 2022 & Sports)
+            { id: 'alkass1', name: 'Alkass One', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8',
-              desc: 'Qatar Sports — Football HD', popular: true },
-            { id: 'alkass2', name: 'Alkass Two', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              desc: 'Alkass Sports — Qatar Football HD', popular: true },
+            { id: 'alkass2', name: 'Alkass Two', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8',
-              desc: 'Qatar Sports — Football HD' },
-            { id: 'alkass3', name: 'Alkass Three', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              desc: 'Alkass Sports — Qatar Football HD' },
+            { id: 'alkass3', name: 'Alkass Three', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8',
-              desc: 'Qatar Sports — Football HD' },
-            { id: 'alkass4', name: 'Alkass Four', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              desc: 'Alkass Sports — Qatar Football HD' },
+            { id: 'alkass4', name: 'Alkass Four', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8',
-              desc: 'Qatar Sports — Football HD' },
-            { id: 'alkass6', name: 'Alkass Six', country: '🇶🇦', category: 'Olahraga', logo: '⚽',
+              desc: 'Alkass Sports — Qatar Football HD' },
+            { id: 'alkass6', name: 'Alkass Six', country: '🇶🇦', category: 'Alkass Qatar', logo: '⚽',
               url: 'https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8',
-              desc: 'Qatar Sports — Football HD' },
-            { id: 'shoof', name: 'Alkass SHOOF', country: '🇶🇦', category: 'Olahraga', logo: '📺',
+              desc: 'Alkass Sports — Qatar Football HD' },
+            { id: 'shoof', name: 'Alkass SHOOF', country: '🇶🇦', category: 'Alkass Qatar', logo: '📺',
               url: 'https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8',
-              desc: 'Alkass Live Stream', popular: true },
-            { id: 'shoof2', name: 'Alkass SHOOF 2', country: '🇶🇦', category: 'Olahraga', logo: '📺',
+              desc: 'Alkass Live Stream — Sports', popular: true },
+            { id: 'shoof2', name: 'Alkass SHOOF 2', country: '🇶🇦', category: 'Alkass Qatar', logo: '📺',
               url: 'https://liveeu-gcp.alkassdigital.net/shooflive2/main.m3u8',
-              desc: 'Alkass Live Stream 2' },
+              desc: 'Alkass Live Stream 2 — Sports' },
 
-            // ── NEWS (1 verified) ──
+            // 🌍 beIN SPORTS — FIFA Rights Holder (Global)
+            { id: 'bein', name: 'beIN Sports XTRA', country: '🌍', category: 'beIN Sports', logo: '⚽',
+              url: 'https://bein-xtra-bein.amagi.tv/playlist.m3u8',
+              desc: 'beIN Sports XTRA — Football Global', popular: true },
+            { id: 'bein_es', name: 'beIN Sports XTRA ES', country: '🌍', category: 'beIN Sports', logo: '⚽',
+              url: 'https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8',
+              desc: 'beIN Sports XTRA — Español' },
+
+            // 📰 NEWS — World Cup Coverage
             { id: 'trt', name: 'TRT World', country: '🇹🇷', category: 'Berita', logo: '📰',
               url: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
-              desc: 'Turkish International News', popular: true },
+              desc: 'TRT World — International News & Sports', popular: true },
         ];
 
         const schedule = [
@@ -232,9 +227,7 @@
             renderTodayMatches();
             updateClock();
             setInterval(updateClock, 1000);
-            document.getElementById('searchChannels').addEventListener('input', (e) => {
-                renderAllChannels(e.target.value);
-            });
+            document.getElementById('searchChannels').addEventListener('input', (e) => renderAllChannels(e.target.value));
         }
 
         function updateClock() {
@@ -310,9 +303,6 @@
             `).join('');
         }
 
-        // ═══════════════════════════════════════════
-        //  PLAYER
-        // ═══════════════════════════════════════════
         function playChannel(id) {
             const ch = channels.find(c => c.id === id);
             if (!ch) return;
@@ -323,10 +313,8 @@
             const error = document.getElementById('errorOverlay');
 
             overlay.classList.add('hidden');
-            error.classList.add('hidden');
-            error.classList.remove('flex');
-            loading.classList.remove('hidden');
-            loading.classList.add('flex');
+            error.classList.add('hidden'); error.classList.remove('flex');
+            loading.classList.remove('hidden'); loading.classList.add('flex');
             document.getElementById('currentChannel').textContent = ch.logo + ' ' + ch.name;
             document.getElementById('currentInfo').textContent = ch.country + ' ' + ch.category + ' — ' + ch.desc;
             document.getElementById('liveIndicator').classList.remove('hidden');
@@ -335,36 +323,21 @@
             if (hls) { hls.destroy(); hls = null; }
 
             if (Hls.isSupported()) {
-                hls = new Hls({
-                    maxBufferLength: 30,
-                    maxMaxBufferLength: 60,
-                    startFragPrefetch: true,
-                    enableWorker: true,
-                });
+                hls = new Hls({ maxBufferLength: 30, maxMaxBufferLength: 60, startFragPrefetch: true, enableWorker: true });
                 hls.loadSource(ch.url);
                 hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    loading.classList.add('hidden');
-                    loading.classList.remove('flex');
-                    video.play().catch(() => {});
-                });
+                hls.on(Hls.Events.MANIFEST_PARSED, () => { loading.classList.add('hidden'); loading.classList.remove('flex'); video.play().catch(() => {}); });
                 hls.on(Hls.Events.ERROR, (event, data) => {
                     if (data.fatal) {
-                        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                            hls.startLoad();
-                        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-                            hls.recoverMediaError();
-                        } else {
-                            showError('Stream error: ' + data.details);
-                        }
+                        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
+                        else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+                        else showError('Stream error: ' + data.details);
                     }
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = ch.url;
                 video.onloadedmetadata = () => { loading.classList.add('hidden'); loading.classList.remove('flex'); video.play().catch(() => {}); };
-            } else {
-                showError('Browser tidak mendukung HLS');
-            }
+            } else { showError('Browser tidak mendukung HLS'); }
 
             renderQuickChannels();
             renderAllChannels(document.getElementById('searchChannels')?.value || '');
@@ -372,36 +345,18 @@
         }
 
         function showError(msg) {
-            document.getElementById('loadingOverlay').classList.add('hidden');
-            document.getElementById('loadingOverlay').classList.remove('flex');
-            const e = document.getElementById('errorOverlay');
-            e.classList.remove('hidden');
-            e.classList.add('flex');
+            document.getElementById('loadingOverlay').classList.add('hidden'); document.getElementById('loadingOverlay').classList.remove('flex');
+            const e = document.getElementById('errorOverlay'); e.classList.remove('hidden'); e.classList.add('flex');
             document.getElementById('errorMsg').textContent = msg;
         }
-
         function retryStream() { if (currentChannelId) playChannel(currentChannelId); }
-
-        function toggleFullscreen() {
-            const p = document.getElementById('videoPlayer');
-            document.fullscreenElement ? document.exitFullscreen() : (p.requestFullscreen?.() || p.webkitRequestFullscreen?.());
-        }
-
-        function pictureInPicture() {
-            const v = document.getElementById('videoPlayer');
-            document.pictureInPictureElement ? document.exitPictureInPicture().catch(() => {}) : v.requestPictureInPicture?.().catch(() => {});
-        }
+        function toggleFullscreen() { const p = document.getElementById('videoPlayer'); document.fullscreenElement ? document.exitFullscreen() : (p.requestFullscreen?.() || p.webkitRequestFullscreen?.()); }
+        function pictureInPicture() { const v = document.getElementById('videoPlayer'); document.pictureInPictureElement ? document.exitPictureInPicture().catch(() => {}) : v.requestPictureInPicture?.().catch(() => {}); }
 
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT') return;
             const v = document.getElementById('videoPlayer');
-            switch(e.key) {
-                case 'f': toggleFullscreen(); break;
-                case ' ': e.preventDefault(); v.paused ? v.play() : v.pause(); break;
-                case 'm': v.muted = !v.muted; break;
-                case 'ArrowUp': v.volume = Math.min(1, v.volume + 0.1); break;
-                case 'ArrowDown': v.volume = Math.max(0, v.volume - 0.1); break;
-            }
+            switch(e.key) { case 'f': toggleFullscreen(); break; case ' ': e.preventDefault(); v.paused ? v.play() : v.pause(); break; case 'm': v.muted = !v.muted; break; }
         });
 
         init();
